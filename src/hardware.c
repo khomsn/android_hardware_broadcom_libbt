@@ -1575,8 +1575,9 @@ static void hw_sco_i2spcm_config(uint16_t codec)
     uint8_t *p, ret;
     uint16_t cmd_u16 = HCI_CMD_PREAMBLE_SIZE + SCO_I2SPCM_PARAM_SIZE;
 
-    if (bt_vendor_cbacks)
+    if (bt_vendor_cbacks){
         p_buf = (HC_BT_HDR *)bt_vendor_cbacks->alloc(BT_HC_HDR_SIZE + cmd_u16);
+    }
 
     if (p_buf)
     {
@@ -1627,6 +1628,7 @@ static void hw_sco_i2spcm_config(uint16_t codec)
 #endif
         bt_vendor_cbacks->audio_state_cb(BT_VND_OP_RESULT_FAIL);
     }
+    ALOGI("%s:EXIT", __func__);
 }
 
 /*******************************************************************************
@@ -1649,6 +1651,7 @@ static int hw_set_SCO_codec(uint16_t codec)
     tINT_CMD_CBACK p_set_SCO_codec_cback;
 
     BTHWDBG( "hw_set_SCO_codec 0x%x", codec);
+    ALOGI("%s:Enter hw_set_SCO_codec 0x%x", __func__, codec);
 
     if (bt_vendor_cbacks)
         p_buf = (HC_BT_HDR *)bt_vendor_cbacks->alloc(
@@ -1703,7 +1706,7 @@ static int hw_set_SCO_codec(uint16_t codec)
     {
         ret_val = -1;
     }
-
+ALOGI("%s:EXIT", __func__);
     return ret_val;
 }
 
@@ -1721,11 +1724,16 @@ static int hw_set_SCO_codec(uint16_t codec)
 int hw_set_audio_state(bt_vendor_op_audio_state_t *p_state)
 {
     int ret_val = -1;
-
-    if (!bt_vendor_cbacks)
-        return ret_val;
+    ALOGI("%s:ENTER", __func__);
+    if (!bt_vendor_cbacks){
+        /* LineageOs 17.1 don't provide bt_vendor_cbacks
+         * via system/bt
+         */
+        ALOGI("%s:bt_vendor_cbacks = NULL", __func__);
+    }
 
     ret_val = hw_set_SCO_codec(p_state->peer_codec);
+    ALOGI("%s:EXIT", __func__);
     return ret_val;
 }
 
